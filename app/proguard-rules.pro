@@ -1,0 +1,7 @@
+-keep class androidx.room.** { *; }
+-keep class ir.elviran.sam.data.** { *; }
+-keep class org.vosk.** { *; }
+-keep class com.sun.jna.** { *; }
+-keep class * extends com.sun.jna.** { *; }
+-dontwarn com.sun.jna.**
+-dontwarn java.awt.**
