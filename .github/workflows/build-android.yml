@@ -27,15 +27,15 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Verify project configuration
-        run: ./gradlew --no-daemon tasks --all > /tmp/sam-gradle-tasks.txt
+        run: bash ./gradlew --no-daemon tasks --all > /tmp/sam-gradle-tasks.txt
       - name: Unit tests
-        run: ./gradlew --no-daemon testDebugUnitTest
+        run: bash ./gradlew --no-daemon testDebugUnitTest
       - name: Build debug APK (with network retry)
         run: |
           set -e
           n=0
           until [ $n -ge 5 ]; do
-            ./gradlew --no-daemon clean assembleDebug && break
+            bash ./gradlew --no-daemon clean assembleDebug && break
             n=$((n+1))
             echo "assembleDebug attempt $n failed; retrying in 20s (helps only transient network/Gradle download errors)"
             sleep 20
