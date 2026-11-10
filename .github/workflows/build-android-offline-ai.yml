@@ -33,13 +33,13 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Unit tests
-        run: ./gradlew --no-daemon testDebugUnitTest
+        run: bash ./gradlew --no-daemon testDebugUnitTest
       - name: Build debug APK with on-device LLM (-PsamLlama, with network retry)
         run: |
           set -e
           n=0
           until [ $n -ge 5 ]; do
-            ./gradlew --no-daemon clean assembleDebug -PsamLlama && break
+            bash ./gradlew --no-daemon clean assembleDebug -PsamLlama && break
             n=$((n+1))
             echo "assembleDebug -PsamLlama attempt $n failed; retrying in 25s (helps only transient network/Gradle/llama.cpp fetch errors)"
             sleep 25
