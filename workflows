@@ -1,0 +1,56 @@
+name: Build SAM Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - name: Install SDK packages
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Verify project configuration
+        run: ./gradlew --no-daemon tasks --all > /tmp/sam-gradle-tasks.txt
+      - name: Unit tests
+        run: ./gradlew --no-daemon testDebugUnitTest
+      - name: Build debug APK (with network retry)
+        run: |
+          set -e
+          n=0
+          until [ $n -ge 5 ]; do
+            ./gradlew --no-daemon clean assembleDebug && break
+            n=$((n+1))
+            echo "assembleDebug attempt $n failed; retrying in 20s (helps only transient network/Gradle download errors)"
+            sleep 20
+          done
+          test -f app/build/outputs/apk/debug/*.apk 2>/dev/null || ls app/build/outputs/apk/debug/
+      - name: Upload APK
+        uses: actions/upload-artifact@v6
+        with:
+          name: SAM-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+      - name: Upload unit test report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: SAM-unit-test-report
+          path: app/build/reports/tests/testDebugUnitTest
+          if-no-files-found: ignore
