@@ -104,11 +104,11 @@ class ConversationController(
                 update {
                     copy(
                         phase = VoicePhase.WAKE_LISTENING,
-                        status = if (prefs.preferOnline && online.isAvailable)
+                        status = if (prefs.preferOnline && this@ConversationController.online.isAvailable)
                             "آماده گفتار آنلاین؛ برای صحبت دکمه «صحبت با سام» را بزن. برای بیدارباش و گفتار آفلاین، مدل Vosk را نصب کن."
                         else "مدل فارسی Vosk نصب نیست؛ برای گفتار آفلاین آن را دانلود کن. در صورت پشتیبانی سرویس گوشی می‌توانی از گفتار آنلاین استفاده کنی.",
                         modelInstalled = false,
-                        engine = if (prefs.preferOnline && online.isAvailable) "آنلاین (fa-IR)" else "بدون مدل گفتار"
+                        engine = if (prefs.preferOnline && this@ConversationController.online.isAvailable) "آنلاین (fa-IR)" else "بدون مدل گفتار"
                     )
                 }
                 return@launch
